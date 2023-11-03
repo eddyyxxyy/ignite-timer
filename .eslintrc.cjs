@@ -29,6 +29,12 @@ module.exports = {
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
     '@typescript-eslint/strict-boolean-expressions': 'warn',
+    '@typescript-eslint/no-empty-interface': [
+      'error',
+      {
+        allowSingleExtends: true,
+      },
+    ],
   },
   settings: {
     react: {
