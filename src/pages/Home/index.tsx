@@ -1,4 +1,7 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Play } from 'phosphor-react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 import {
   CountdownContainer,
@@ -10,18 +13,46 @@ import {
   TaskInput,
 } from './styles';
 
+const newCycleFormValidationSchema = z.object({
+  task: z.string().min(1, 'Informe a tarefa'),
+  minutesAmount: z
+    .number()
+    .min(5, 'O ciclo precisa ser de no mínimo 5 minutos')
+    .max(60, 'O ciclo precisa ser de no máximo 60 minutos'),
+});
+
+type TNewCycleFormData = z.infer<typeof newCycleFormValidationSchema>;
+
 export function Home() {
+  const { register, handleSubmit, reset, watch } = useForm<TNewCycleFormData>({
+    resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    },
+  });
+
+  // TODO: implement form handling function
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function handleCreateNewCycle(data: TNewCycleFormData) {
+    reset();
+  }
+
+  const task = watch('task');
+  const minutesAmount = watch('minutesAmount');
+  const isSubmitDisabled = !task && !minutesAmount;
+
   return (
     <HomeContainer>
-      <form action="">
+      <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
         <FormContainer>
           <label htmlFor="task">Vou trabalhar em</label>
           <TaskInput
             type="text"
-            name="task"
             id="task"
-            placeholder="Dê um nome para seu projeto"
             list="taskSuggestions"
+            placeholder="Dê um nome para seu projeto"
+            {...register('task')}
           />
 
           <datalist id="taskSuggestions">
@@ -33,12 +64,12 @@ export function Home() {
           <label htmlFor="minutesAmount">durante</label>
           <MinutesAmountInput
             type="number"
-            name="minutesAmount"
             id="minutesAmount"
             placeholder="00"
             step={5}
             min={5}
             max={60}
+            {...register('minutesAmount', { valueAsNumber: true })}
           />
           <span>minutos.</span>
         </FormContainer>
@@ -51,7 +82,7 @@ export function Home() {
           <span>0</span>
         </CountdownContainer>
 
-        <StartCountdownButton disabled type="submit">
+        <StartCountdownButton disabled={isSubmitDisabled} type="submit">
           <Play size={24} /> Começar
         </StartCountdownButton>
       </form>
