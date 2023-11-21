@@ -16,6 +16,25 @@ interface CyclesState {
   activeCycleId: string | null;
 }
 
+interface CyclesInitialState {
+  cycles: Cycle[];
+  activeCycleId: null;
+}
+
+export function cyclesInitializer(
+  initialState: CyclesInitialState,
+): CyclesState | CyclesInitialState {
+  const storageStateAsJSON = localStorage.getItem(
+    '@ignite-timer:cycles-state-1.0.0',
+  );
+
+  if (storageStateAsJSON !== null) {
+    return JSON.parse(storageStateAsJSON) as CyclesState;
+  }
+
+  return initialState;
+}
+
 export function cyclesReducer(
   state: CyclesState,
   action: ActionTypesProps,
